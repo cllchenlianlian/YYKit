@@ -31,8 +31,9 @@ NSString *const YYTextBlockBorderAttributeName = @"YYTextBlockBorder";
 NSString *const YYTextAttachmentAttributeName = @"YYTextAttachment";
 NSString *const YYTextHighlightAttributeName = @"YYTextHighlight";
 NSString *const YYTextGlyphTransformAttributeName = @"YYTextGlyphTransform";
-
+/**一般图文混排时候的占位符*/
 NSString *const YYTextAttachmentToken = @"\uFFFC";
+/**这个是不是用于某个特殊字符串的结尾*/
 NSString *const YYTextTruncationToken = @"\u2026";
 
 

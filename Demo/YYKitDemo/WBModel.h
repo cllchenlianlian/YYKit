@@ -240,14 +240,17 @@ typedef NS_ENUM(NSUInteger, WBPictureBadgeType) {
  微博
  */
 @interface WBStatus : NSObject
+/** 微博id */
 @property (nonatomic, assign) uint64_t statusID; ///< id (number)
+/** 不知道 */
 @property (nonatomic, strong) NSString *idstr; ///< id (string)
+/** 不知道 */
 @property (nonatomic, strong) NSString *mid;
+/** 不知道 */
 @property (nonatomic, strong) NSString *rid;
 @property (nonatomic, strong) NSDate *createdAt; ///< 发布时间
-
-@property (nonatomic, strong) WBUser *user;
-@property (nonatomic, assign) int32_t userType;
+@property (nonatomic, strong) WBUser *user; ///< 当前发微博的用户
+@property (nonatomic, assign) int32_t userType; ///< 用户类型
 
 @property (nonatomic, strong) WBStatusTitle *title; ///< 标题栏 (通常为nil)
 @property (nonatomic, strong) NSString *picBg; ///< 微博VIP背景图，需要替换 "os7"
@@ -299,21 +302,52 @@ typedef NS_ENUM(NSUInteger, WBPictureBadgeType) {
  一次API请求的数据
  */
 @interface WBTimelineItem : NSObject
+/** 不知道干嘛的*/
 @property (nonatomic, strong) NSArray *ad;
+/** 不知道干嘛的*/
 @property (nonatomic, strong) NSArray *advertises;
+/** 不知道干嘛的*/
 @property (nonatomic, strong) NSString *gsid;
+/** 不知道干嘛的*/
 @property (nonatomic, assign) int32_t interval;
+/** 不知道干嘛的*/
 @property (nonatomic, assign) int32_t uveBlank;
+/** 不知道干嘛的*/
 @property (nonatomic, assign) int32_t hasUnread;
+/** 不知道干嘛的*/
 @property (nonatomic, assign) int32_t totalNumber;
+/** 不知道干嘛的*/
 @property (nonatomic, strong) NSString *sinceID;
+/** 不知道干嘛的*/
 @property (nonatomic, strong) NSString *maxID;
+/** 不知道干嘛的*/
 @property (nonatomic, strong) NSString *previousCursor;
+/** 不知道干嘛的*/
 @property (nonatomic, strong) NSString *nextCursor;
+// 主要是这个字段
 @property (nonatomic, strong) NSArray<WBStatus *> *statuses;
 /*
  groupInfo
  trends
+ */
+/*
+ + (NSDictionary *)modelCustomPropertyMapper {
+    return @{
+                @"hasVisible" : @"hasvisible",
+                @"previousCursor" : @"previous_cursor",
+                @"uveBlank" : @"uve_blank",
+                @"hasUnread" : @"has_unread",
+                @"totalNumber" : @"total_number",
+                @"maxID" : @"max_id",
+                @"sinceID" : @"since_id",
+                @"nextCursor" : @"next_cursor"
+            };
+}
+ + (NSDictionary *)modelContainerPropertyGenericClass {
+    return @{
+                @"statuses" : [WBStatus class]
+            };
+ }
  */
 @end
 

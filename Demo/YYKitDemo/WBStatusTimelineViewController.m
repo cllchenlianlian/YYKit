@@ -82,8 +82,8 @@
             NSData *data = [NSData dataNamed:[NSString stringWithFormat:@"weibo_%d.json",i]];
             WBTimelineItem *item = [WBTimelineItem modelWithJSON:data];
             for (WBStatus *status in item.statuses) {
+                // 根据模型生成布局对象
                 WBStatusLayout *layout = [[WBStatusLayout alloc] initWithStatus:status style:WBLayoutStyleTimeline];
-//                [layout layout];
                 [_layouts addObject:layout];
             }
         }

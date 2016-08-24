@@ -53,8 +53,6 @@
 
 - (CGFloat)heightForLineCount:(NSUInteger)lineCount {
     if (lineCount == 0) return 0;
-//    CGFloat ascent = _font.ascender;
-//    CGFloat descent = -_font.descender;
     CGFloat ascent = _font.pointSize * 0.86;
     CGFloat descent = _font.pointSize * 0.14;
     CGFloat lineHeight = _font.pointSize * _lineHeightMultiple;
@@ -135,9 +133,11 @@
     if (_retweetHeight == 0) {
         [self _layoutPics];
         if (_picHeight == 0) {
+            // 如果没有微博图片，就看看没有卡片
             [self _layoutCard];
         }
     }
+    // 处理自己微博的文本
     [self _layoutText];
     [self _layoutTag];
     [self _layoutToolbar];
@@ -155,6 +155,7 @@
     } else if (_cardHeight > 0) {
         _height += _cardHeight;
     }
+    
     if (_tagHeight > 0) {
         _height += _tagHeight;
     } else {
@@ -165,7 +166,7 @@
     _height += _toolbarHeight;
     _height += _marginBottom;
 }
-
+/// 阅读完毕
 - (void)_layoutTitle {
     _titleHeight = 0;
     _titleTextLayout = nil;
@@ -187,7 +188,7 @@
     _titleTextLayout = [YYTextLayout layoutWithContainer:container text:text];
     _titleHeight = kWBCellTitleHeight;
 }
-
+/// 阅读完毕
 - (void)_layoutProfile {
     [self _layoutName];
     [self _layoutSource];
@@ -234,9 +235,10 @@
     nameText.font = [UIFont systemFontOfSize:kWBCellNameFontSize];
     nameText.color = user.mbrank > 0 ? kWBCellNameOrangeColor : kWBCellNameNormalColor;
     nameText.lineBreakMode = NSLineBreakByCharWrapping;
-    
+    // 允许最大的包含区域
     YYTextContainer *container = [YYTextContainer containerWithSize:CGSizeMake(kWBCellNameWidth, 9999)];
     container.maximumNumberOfRows = 1;
+    // 最大区域+文本字符串 获取 最好的区域
     _nameTextLayout = [YYTextLayout layoutWithContainer:container text:nameText];
 }
 
@@ -257,6 +259,7 @@
     // 来自 XXX
     if (_status.source.length) {
         // <a href="sinaweibo://customweibosource" rel="nofollow">iPhone 5siPhone 5s</a>
+        // 判断是否可以点击
         static NSRegularExpression *hrefRegex, *textRegex;
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
@@ -268,7 +271,9 @@
         hrefResult = [hrefRegex firstMatchInString:_status.source options:kNilOptions range:NSMakeRange(0, _status.source.length)];
         textResult = [textRegex firstMatchInString:_status.source options:kNilOptions range:NSMakeRange(0, _status.source.length)];
         if (hrefResult && textResult && hrefResult.range.location != NSNotFound && textResult.range.location != NSNotFound) {
+            // 获取匹配到的连接
             href = [_status.source substringWithRange:hrefResult.range];
+            // 获取匹配到的文本
             text = [_status.source substringWithRange:textResult.range];
         }
         if (href.length && text.length) {
@@ -279,13 +284,15 @@
             if (_status.sourceAllowClick > 0) {
                 NSRange range = NSMakeRange(3, text.length);
                 [from setColor:kWBCellTextHighlightColor range:range];
+#warning 这个YYTextBackedString是什么效果，猜测是，后面的链接，用于处理点击后的跳转
                 YYTextBackedString *backed = [YYTextBackedString stringWithString:href];
                 [from setTextBackedString:backed range:range];
-                
+                // 设置文本的边框属性
                 YYTextBorder *border = [YYTextBorder new];
                 border.insets = UIEdgeInsetsMake(-2, 0, -2, 0);
                 border.fillColor = kWBCellTextHighlightBackgroundColor;
                 border.cornerRadius = 3;
+                // 文本的高亮效果
                 YYTextHighlight *highlight = [YYTextHighlight new];
                 if (href) highlight.userInfo = @{kWBLinkHrefName : href};
                 [highlight setBackgroundBorder:border];
@@ -307,7 +314,9 @@
 
 - (void)_layoutRetweet {
     _retweetHeight = 0;
+    // 计算微博转发中内容的布局
     [self _layoutRetweetedText];
+    // 计算微博的图片
     [self _layoutRetweetPics];
     if (_retweetPicHeight == 0) {
         [self _layoutRetweetCard];
@@ -323,7 +332,7 @@
     }
 }
 
-/// 文本
+/// 阅读完毕 文本
 - (void)_layoutText {
     _textHeight = 0;
     _textLayout = nil;
@@ -349,10 +358,13 @@
     _textHeight = [modifier heightForLineCount:_textLayout.rowCount];
 }
 
-
+/**
+ *  计算微博转发中内容字符串的布局
+ */
 - (void)_layoutRetweetedText {
     _retweetHeight = 0;
     _retweetTextLayout = nil;
+    // 微博内容的属性字符串，不包括图片
     NSMutableAttributedString *text = [self _textWithStatus:_status.retweetedStatus
                                                   isRetweet:YES
                                                    fontSize:kWBCellTextFontRetweetSize
@@ -377,11 +389,17 @@
 - (void)_layoutPics {
     [self _layoutPicsWithStatus:_status isRetweet:NO];
 }
-
+/**
+ *  阅读完毕：计算转发的微博图片size
+ */
 - (void)_layoutRetweetPics {
     [self _layoutPicsWithStatus:_status.retweetedStatus isRetweet:YES];
 }
-
+/**
+ *  计算微博中每个图片的size和图片的总高度
+ *  @param status    微博
+ *  @param isRetweet 是否是转发
+ */
 - (void)_layoutPicsWithStatus:(WBStatus *)status isRetweet:(BOOL)isRetweet {
     if (isRetweet) {
         _retweetPicSize = CGSizeZero;
@@ -391,11 +409,13 @@
         _picHeight = 0;
     }
     if (status.pics.count == 0) return;
-    
+    // picSize表示每个图片的size
     CGSize picSize = CGSizeZero;
+    // pic的总高度
     CGFloat picHeight = 0;
     
     CGFloat len1_3 = (kWBCellContentWidth + kWBCellPaddingPic) / 3 - kWBCellPaddingPic;
+#warning 这个函数什么意思
     len1_3 = CGFloatPixelRound(len1_3);
     switch (status.pics.count) {
         case 1: {
@@ -441,7 +461,9 @@
         _picHeight = picHeight;
     }
 }
-
+/**
+ *  阅读完毕
+ */
 - (void)_layoutCard {
     [self _layoutCardWithStatus:_status isRetweet:NO];
 }
@@ -449,7 +471,12 @@
 - (void)_layoutRetweetCard {
     [self _layoutCardWithStatus:_status.retweetedStatus isRetweet:YES];
 }
+/**
+ *  计算微博中小卡片的布局，例子中，第二条微博，为周杰伦正名的卡片
 
+ *  @param status    微博
+ *  @param isRetweet 是否是转发
+ */
 - (void)_layoutCardWithStatus:(WBStatus *)status isRetweet:(BOOL)isRetweet {
     if (isRetweet) {
         _retweetCardType = WBStatusCardTypeNone;
@@ -468,9 +495,10 @@
     WBStatusCardType cardType = WBStatusCardTypeNone;
     CGFloat cardHeight = 0;
     YYTextLayout *cardTextLayout = nil;
+    // 文本的Rect
     CGRect textRect = CGRectZero;
     
-    if ((pageInfo.type == 11) && [pageInfo.objectType isEqualToString:@"video"]) {
+    if ((pageInfo.type == 11) && [pageInfo.objectType isEqualToString:@"video"]) { 
         // 视频，一个大图片，上面播放按钮
         if (pageInfo.pagePic) {
             cardType = WBStatusCardTypeVideo;
@@ -510,6 +538,7 @@
         
         NSMutableAttributedString *text = [NSMutableAttributedString new];
         if (pageInfo.pageTitle.length) {
+            // 标题的文本属性
             NSMutableAttributedString *title = [[NSMutableAttributedString alloc] initWithString:pageInfo.pageTitle];
             
             title.font = [UIFont systemFontOfSize:kWBCellCardTitleFontSize];
@@ -518,6 +547,7 @@
         }
         
         if (pageInfo.pageDesc.length) {
+            // 如果有描述、内容描述属性
             if (text.length) [text appendString:@"\n"];
             NSMutableAttributedString *desc = [[NSMutableAttributedString alloc] initWithString:pageInfo.pageDesc];
             desc.font = [UIFont systemFontOfSize:kWBCellCardDescFontSize];
@@ -538,6 +568,7 @@
         }
         
         if (pageInfo.tips.length) {
+            // 多少人关注的文本属性
             if (text.length) [text appendString:@"\n"];
             NSMutableAttributedString *tips = [[NSMutableAttributedString alloc] initWithString:pageInfo.tips];
             tips.font = [UIFont systemFontOfSize:kWBCellCardDescFontSize];
@@ -574,7 +605,9 @@
     }
     
 }
-
+/**
+ *  <#Description#>
+ */
 - (void)_layoutTag {
     _tagType = WBStatusTagTypeNone;
     _tagHeight = 0;
@@ -618,7 +651,7 @@
         _tagHeight = 0;
     }
 }
-
+/** 阅读完毕 */
 - (void)_layoutToolbar {
     // should be localized
     UIFont *font = [UIFont systemFontOfSize:kWBCellToolbarFontSize];
@@ -656,6 +689,7 @@
     NSMutableString *string = status.text.mutableCopy;
     if (string.length == 0) return nil;
     if (isRetweet) {
+        // 如果是转发的微博，在文本前设置  @名字:内容
         NSString *name = status.user.name;
         if (name.length == 0) {
             name = status.user.screenName;
@@ -687,6 +721,7 @@
         }
         NSRange searchRange = NSMakeRange(0, text.string.length);
         do {
+            // 查找出短链接在原文中的位置，用于替换为指定字符串
             NSRange range = [text.string rangeOfString:wburl.shortURL options:kNilOptions range:searchRange];
             if (range.location == NSNotFound) break;
             
@@ -701,15 +736,15 @@
                     }
                 }
             }
-            
             if ([text attribute:YYTextHighlightAttributeName atIndex:range.location] == nil) {
-                
+                // 如果当前位置没有设置高亮状态，那么设置
                 // 替换的内容
                 NSMutableAttributedString *replace = [[NSMutableAttributedString alloc] initWithString:urlTitle];
                 if (wburl.urlTypePic.length) {
-                    // 链接头部有个图片附件 (要从网络获取)
+                    // 链接头部有个图片附件 (要从网络获取)，即查看图片前面的小图片
                     NSURL *picURL = [WBStatusHelper defaultURLForImageURL:wburl.urlTypePic];
                     UIImage *image = [[YYImageCache sharedCache] getImageForKey:picURL.absoluteString];
+                    // 如果有图片，那就设置图片的占位符，如果没有图片，就设置URL的占位符
                     NSAttributedString *pic = (image && !wburl.pics.count) ? [self _attachmentWithFontSize:fontSize image:image shrink:YES] : [self _attachmentWithFontSize:fontSize imageURL:wburl.urlTypePic shrink:YES];
                     [replace insertAttributedString:pic atIndex:0];
                 }
@@ -804,7 +839,12 @@
     return text;
 }
 
-
+/**
+ *  将图片拼接到文字后面
+ *  @param fontSize 字体大小
+ *  @param image    要附件的图片
+ *  @param shrink   收缩?
+ */
 - (NSAttributedString *)_attachmentWithFontSize:(CGFloat)fontSize image:(UIImage *)image shrink:(BOOL)shrink {
     
     //    CGFloat ascent = YYEmojiGetAscentWithFontSize(fontSize);
@@ -815,8 +855,9 @@
     CGFloat ascent = fontSize * 0.86;
     CGFloat descent = fontSize * 0.14;
     CGRect bounding = CGRectMake(0, -0.14 * fontSize, fontSize, fontSize);
+#warning 这里怎么算的
     UIEdgeInsets contentInsets = UIEdgeInsetsMake(ascent - (bounding.size.height + bounding.origin.y), 0, descent + bounding.origin.y, 0);
-    
+    // Run的代理
     YYTextRunDelegate *delegate = [YYTextRunDelegate new];
     delegate.ascent = ascent;
     delegate.descent = descent;
@@ -828,6 +869,7 @@
     attachment.content = image;
     
     if (shrink) {
+#warning 先不看这里
         // 缩小~
         CGFloat scale = 1 / 10.0;
         contentInsets.top += fontSize * scale;
@@ -839,8 +881,10 @@
     }
     
     NSMutableAttributedString *atr = [[NSMutableAttributedString alloc] initWithString:YYTextAttachmentToken];
+    // 设置当前字符串的属性，就像为文本设置颜色属性一样
     [atr setTextAttachment:attachment range:NSMakeRange(0, atr.length)];
     CTRunDelegateRef ctDelegate = delegate.CTRunDelegate;
+    // 设置当前占位符run的代理
     [atr setRunDelegate:ctDelegate range:NSMakeRange(0, atr.length)];
     if (ctDelegate) CFRelease(ctDelegate);
     

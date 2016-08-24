@@ -46,7 +46,7 @@
 @end
 
 
-
+/** 微博的cell的显示内容 */
 @interface T1StatusView : YYControl
 @property (nonatomic, strong) UIView *topLine;
 @property (nonatomic, strong) UIImageView *socialIconView;
