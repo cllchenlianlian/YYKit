@@ -76,13 +76,14 @@
 
 
 
-
+/** 微博内容*/
 @interface WBStatusView : UIView
 @property (nonatomic, strong) UIView *contentView;              // 容器
 @property (nonatomic, strong) WBStatusTitleView *titleView;     // 标题栏
 @property (nonatomic, strong) WBStatusProfileView *profileView; // 用户资料
 @property (nonatomic, strong) YYLabel *textLabel;               // 文本
 @property (nonatomic, strong) NSArray<UIView *> *picViews;      // 图片
+// 注意这个view的frame和retweetTextLabel的frame
 @property (nonatomic, strong) UIView *retweetBackgroundView;    //转发容器
 @property (nonatomic, strong) YYLabel *retweetTextLabel;        // 转发文本
 @property (nonatomic, strong) WBStatusCardView *cardView;       // 卡片

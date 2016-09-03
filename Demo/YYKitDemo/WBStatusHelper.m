@@ -82,6 +82,7 @@
     static YYWebImageManager *manager;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
+        // 在跟缓存文件目录下，生成一个weibo.avatar的文件夹，转发存放圆角的头像
         NSString *path = [[UIApplication sharedApplication].cachesPath stringByAppendingPathComponent:@"weibo.avatar"];
         YYImageCache *cache = [[YYImageCache alloc] initWithPath:path];
         manager = [[YYWebImageManager alloc] initWithCache:cache queue:[YYWebImageManager sharedManager].queue];

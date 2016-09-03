@@ -79,17 +79,17 @@
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         for (int i = 0; i <= 7; i++) {
-            NSData *data = [NSData dataNamed:[NSString stringWithFormat:@"weibo_%d.json",i]];
+            NSData *data = [NSData dataNamed:[NSString stringWithFormat:@"weibo_%d.json",0]];
             WBTimelineItem *item = [WBTimelineItem modelWithJSON:data];
             for (WBStatus *status in item.statuses) {
                 // 根据模型生成布局对象
                 WBStatusLayout *layout = [[WBStatusLayout alloc] initWithStatus:status style:WBLayoutStyleTimeline];
                 [_layouts addObject:layout];
+//                if (_layouts.count == 2) {
+//                    break;
+//                }
             }
         }
-        
-        // 复制一下，让列表长一些，不至于滑两下就到底了
-        [_layouts addObjectsFromArray:_layouts];
         
         dispatch_async(dispatch_get_main_queue(), ^{
             self.title = [NSString stringWithFormat:@"Weibo (loaded:%d)", (int)_layouts.count];
@@ -152,7 +152,7 @@
     return _layouts.count;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath { 
     NSString *cellID = @"cell";
     WBStatusCell *cell = [tableView dequeueReusableCellWithIdentifier:cellID];
     if (!cell) {
@@ -176,7 +176,7 @@
 
 /// 点击了 Cell
 - (void)cellDidClick:(WBStatusCell *)cell {
-    
+    NSLog(@"%s",__func__);
 }
 
 /// 点击了 Card

@@ -53,8 +53,8 @@
 
 - (CGFloat)heightForLineCount:(NSUInteger)lineCount {
     if (lineCount == 0) return 0;
-    CGFloat ascent = _font.pointSize * 0.86;
-    CGFloat descent = _font.pointSize * 0.14;
+    CGFloat ascent     = _font.pointSize * 0.86;
+    CGFloat descent    = _font.pointSize * 0.14;
     CGFloat lineHeight = _font.pointSize * _lineHeightMultiple;
     return _paddingTop + _paddingBottom + ascent + descent + (lineCount - 1) * lineHeight;
 }
@@ -62,9 +62,7 @@
 @end
 
 
-/**
- 微博的文本中，某些嵌入的图片需要从网上下载，这里简单做个封装
- */
+/** 微博的文本中，某些嵌入的图片需要从网上下载，这里简单做个封装*/
 @interface WBTextImageViewAttachment : YYTextAttachment
 @property (nonatomic, strong) NSURL *imageURL;
 @property (nonatomic, assign) CGSize size;
@@ -129,6 +127,7 @@
     // 文本排版，计算布局
     [self _layoutTitle];
     [self _layoutProfile];
+    // 处理转发的内容
     [self _layoutRetweet];
     if (_retweetHeight == 0) {
         [self _layoutPics];
@@ -166,7 +165,7 @@
     _height += _toolbarHeight;
     _height += _marginBottom;
 }
-/// 阅读完毕
+/// 计算标题 第二次阅读
 - (void)_layoutTitle {
     _titleHeight = 0;
     _titleTextLayout = nil;
@@ -182,20 +181,20 @@
         }
     }
     text.color = kWBCellToolbarTitleColor;
-    text.font = [UIFont systemFontOfSize:kWBCellTitlebarFontSize];
+    text.font  = [UIFont systemFontOfSize:kWBCellTitlebarFontSize];
     
     YYTextContainer *container = [YYTextContainer containerWithSize:CGSizeMake(kScreenWidth - 100, kWBCellTitleHeight)];
     _titleTextLayout = [YYTextLayout layoutWithContainer:container text:text];
     _titleHeight = kWBCellTitleHeight;
 }
-/// 阅读完毕
+/// 阅读完毕 第二次阅读
 - (void)_layoutProfile {
     [self _layoutName];
     [self _layoutSource];
     _profileHeight = kWBCellProfileHeight;
 }
 
-/// 名字
+/// 名字 第二次阅读
 - (void)_layoutName {
     WBUser *user = _status.user;
     NSString *nameStr = nil;
@@ -210,9 +209,7 @@
         _nameTextLayout = nil;
         return;
     }
-    
     NSMutableAttributedString *nameText = [[NSMutableAttributedString alloc] initWithString:nameStr];
-    
     // 蓝V
     if (user.userVerifyType == WBUserVerifyTypeOrganization) {
         UIImage *blueVImage = [WBStatusHelper imageNamed:@"avatar_enterprise_vip"];
@@ -242,11 +239,10 @@
     _nameTextLayout = [YYTextLayout layoutWithContainer:container text:nameText];
 }
 
-/// 时间和来源
+/// 时间和来源 第二次阅读
 - (void)_layoutSource {
     NSMutableAttributedString *sourceText = [NSMutableAttributedString new];
     NSString *createTime = [WBStatusHelper stringWithTimelineDate:_status.createdAt];
-    
     // 时间
     if (createTime.length) {
         NSMutableAttributedString *timeText = [[NSMutableAttributedString alloc] initWithString:createTime];
@@ -255,17 +251,17 @@
         timeText.color = kWBCellTimeNormalColor;
         [sourceText appendAttributedString:timeText];
     }
-    
-    // 来自 XXX
+    // 来自 XXX，这里使用到正则
     if (_status.source.length) {
         // <a href="sinaweibo://customweibosource" rel="nofollow">iPhone 5siPhone 5s</a>
-        // 判断是否可以点击
+        // 初始化正则表达式
         static NSRegularExpression *hrefRegex, *textRegex;
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
             hrefRegex = [NSRegularExpression regularExpressionWithPattern:@"(?<=href=\").+(?=\" )" options:kNilOptions error:NULL];
             textRegex = [NSRegularExpression regularExpressionWithPattern:@"(?<=>).+(?=<)" options:kNilOptions error:NULL];
         });
+        // 获取正则的结果
         NSTextCheckingResult *hrefResult, *textResult;
         NSString *href = nil, *text = nil;
         hrefResult = [hrefRegex firstMatchInString:_status.source options:kNilOptions range:NSMakeRange(0, _status.source.length)];
@@ -281,10 +277,11 @@
             [from appendString:[NSString stringWithFormat:@"来自 %@", text]];
             from.font = [UIFont systemFontOfSize:kWBCellSourceFontSize];
             from.color = kWBCellTimeNormalColor;
+            // text可以点击
             if (_status.sourceAllowClick > 0) {
                 NSRange range = NSMakeRange(3, text.length);
                 [from setColor:kWBCellTextHighlightColor range:range];
-#warning 这个YYTextBackedString是什么效果，猜测是，后面的链接，用于处理点击后的跳转
+                // 点击这个range后，拿到的内容为YYTextBackedString，这个封装数据
                 YYTextBackedString *backed = [YYTextBackedString stringWithString:href];
                 [from setTextBackedString:backed range:range];
                 // 设置文本的边框属性
@@ -311,7 +308,7 @@
         _sourceTextLayout = [YYTextLayout layoutWithContainer:container text:sourceText];
     }
 }
-
+/// 第二次阅读
 - (void)_layoutRetweet {
     _retweetHeight = 0;
     // 计算微博转发中内容的布局
@@ -332,7 +329,7 @@
     }
 }
 
-/// 阅读完毕 文本
+/// 阅读完毕 文本 阅读第二次
 - (void)_layoutText {
     _textHeight = 0;
     _textLayout = nil;
@@ -358,9 +355,7 @@
     _textHeight = [modifier heightForLineCount:_textLayout.rowCount];
 }
 
-/**
- *  计算微博转发中内容字符串的布局
- */
+/** 计算微博转发中内容字符串的布局*/
 - (void)_layoutRetweetedText {
     _retweetHeight = 0;
     _retweetTextLayout = nil;
@@ -370,7 +365,7 @@
                                                    fontSize:kWBCellTextFontRetweetSize
                                                   textColor:kWBCellTextSubTitleColor];
     if (text.length == 0) return;
-    
+    // 做调整，类似于css中的盒子模型
     WBTextLinePositionModifier *modifier = [WBTextLinePositionModifier new];
     modifier.font = [UIFont fontWithName:@"Heiti SC" size:kWBCellTextFontRetweetSize];
     modifier.paddingTop = kWBCellPaddingText;
@@ -389,17 +384,11 @@
 - (void)_layoutPics {
     [self _layoutPicsWithStatus:_status isRetweet:NO];
 }
-/**
- *  阅读完毕：计算转发的微博图片size
- */
+/** 计算转发的微博图片size 阅读第二次*/
 - (void)_layoutRetweetPics {
     [self _layoutPicsWithStatus:_status.retweetedStatus isRetweet:YES];
 }
-/**
- *  计算微博中每个图片的size和图片的总高度
- *  @param status    微博
- *  @param isRetweet 是否是转发
- */
+/** 计算微博中每个图片的size和图片的总高度  阅读第二次*/
 - (void)_layoutPicsWithStatus:(WBStatus *)status isRetweet:(BOOL)isRetweet {
     if (isRetweet) {
         _retweetPicSize = CGSizeZero;
@@ -413,9 +402,8 @@
     CGSize picSize = CGSizeZero;
     // pic的总高度
     CGFloat picHeight = 0;
-    
+    // 一行3个图片时候的长度
     CGFloat len1_3 = (kWBCellContentWidth + kWBCellPaddingPic) / 3 - kWBCellPaddingPic;
-#warning 这个函数什么意思
     len1_3 = CGFloatPixelRound(len1_3);
     switch (status.pics.count) {
         case 1: {
@@ -461,9 +449,7 @@
         _picHeight = picHeight;
     }
 }
-/**
- *  阅读完毕
- */
+/** 阅读第二次*/
 - (void)_layoutCard {
     [self _layoutCardWithStatus:_status isRetweet:NO];
 }
@@ -471,12 +457,7 @@
 - (void)_layoutRetweetCard {
     [self _layoutCardWithStatus:_status.retweetedStatus isRetweet:YES];
 }
-/**
- *  计算微博中小卡片的布局，例子中，第二条微博，为周杰伦正名的卡片
-
- *  @param status    微博
- *  @param isRetweet 是否是转发
- */
+/** 计算微博中小卡片的布局，例子中，第二条微博，为周杰伦正名的卡片 阅读第二次*/
 - (void)_layoutCardWithStatus:(WBStatus *)status isRetweet:(BOOL)isRetweet {
     if (isRetweet) {
         _retweetCardType = WBStatusCardTypeNone;
@@ -498,6 +479,7 @@
     // 文本的Rect
     CGRect textRect = CGRectZero;
     
+    // 不看 type == 11
     if ((pageInfo.type == 11) && [pageInfo.objectType isEqualToString:@"video"]) { 
         // 视频，一个大图片，上面播放按钮
         if (pageInfo.pagePic) {
@@ -509,6 +491,7 @@
         BOOL hasBadge = pageInfo.typeIcon != nil;
         WBButtonLink *button = pageInfo.buttons.firstObject;
         BOOL hasButtom = button.pic && button.name;
+        NSLog(@"%d,%d,%d",hasImage,hasBadge,hasButtom);
         
         /*
          badge: 25,25 左上角 (42)
@@ -605,9 +588,7 @@
     }
     
 }
-/**
- *  <#Description#>
- */
+// 没看
 - (void)_layoutTag {
     _tagType = WBStatusTagTypeNone;
     _tagHeight = 0;
@@ -651,7 +632,7 @@
         _tagHeight = 0;
     }
 }
-/** 阅读完毕 */
+/** 阅读第二次*/
 - (void)_layoutToolbar {
     // should be localized
     UIFont *font = [UIFont systemFontOfSize:kWBCellToolbarFontSize];
@@ -677,9 +658,7 @@
     _toolbarLikeTextWidth = CGFloatPixelRound(_toolbarLikeTextLayout.textBoundingRect.size.width);
 }
 
-
-
-
+// 第二次阅读
 - (NSMutableAttributedString *)_textWithStatus:(WBStatus *)status
                                      isRetweet:(BOOL)isRetweet
                                       fontSize:(CGFloat)fontSize
@@ -724,8 +703,9 @@
             // 查找出短链接在原文中的位置，用于替换为指定字符串
             NSRange range = [text.string rangeOfString:wburl.shortURL options:kNilOptions range:searchRange];
             if (range.location == NSNotFound) break;
-            
+            // 这里没看
             if (range.location + range.length == text.length) {
+                // 如果在你字符串末尾,没看这里
                 if (status.pageInfo.pageID && wburl.pageID &&
                     [wburl.pageID isEqualToString:status.pageInfo.pageID]) {
                     if ((!isRetweet && !status.retweetedStatus) || isRetweet) {
@@ -736,7 +716,9 @@
                     }
                 }
             }
-            if ([text attribute:YYTextHighlightAttributeName atIndex:range.location] == nil) {
+            // 看
+            if ([text attribute:YYTextHighlightAttributeName atIndex:range.location] == nil)
+            {
                 // 如果当前位置没有设置高亮状态，那么设置
                 // 替换的内容
                 NSMutableAttributedString *replace = [[NSMutableAttributedString alloc] initWithString:urlTitle];
@@ -839,12 +821,7 @@
     return text;
 }
 
-/**
- *  将图片拼接到文字后面
- *  @param fontSize 字体大小
- *  @param image    要附件的图片
- *  @param shrink   收缩?
- */
+/** 图片混排，image 阅读第二次*/
 - (NSAttributedString *)_attachmentWithFontSize:(CGFloat)fontSize image:(UIImage *)image shrink:(BOOL)shrink {
     
     //    CGFloat ascent = YYEmojiGetAscentWithFontSize(fontSize);
@@ -855,7 +832,7 @@
     CGFloat ascent = fontSize * 0.86;
     CGFloat descent = fontSize * 0.14;
     CGRect bounding = CGRectMake(0, -0.14 * fontSize, fontSize, fontSize);
-#warning 这里怎么算的
+
     UIEdgeInsets contentInsets = UIEdgeInsetsMake(ascent - (bounding.size.height + bounding.origin.y), 0, descent + bounding.origin.y, 0);
     // Run的代理
     YYTextRunDelegate *delegate = [YYTextRunDelegate new];
@@ -869,7 +846,6 @@
     attachment.content = image;
     
     if (shrink) {
-#warning 先不看这里
         // 缩小~
         CGFloat scale = 1 / 10.0;
         contentInsets.top += fontSize * scale;
@@ -891,13 +867,15 @@
     return atr;
 }
 
+/** 阅读第二次，图片图片，URL*/
 - (NSAttributedString *)_attachmentWithFontSize:(CGFloat)fontSize imageURL:(NSString *)imageURL shrink:(BOOL)shrink {
     /*
      微博 URL 嵌入的图片，比临近的字体要小一圈。。
      这里模拟一下 Heiti SC 字体，然后把图片缩小一下。
      */
-    CGFloat ascent = fontSize * 0.86;
+    CGFloat ascent  = fontSize * 0.86;
     CGFloat descent = fontSize * 0.14;
+    // 基准线(0) - descent
     CGRect bounding = CGRectMake(0, -0.14 * fontSize, fontSize, fontSize);
     UIEdgeInsets contentInsets = UIEdgeInsetsMake(ascent - (bounding.size.height + bounding.origin.y), 0, descent + bounding.origin.y, 0);
     CGSize size = CGSizeMake(fontSize, fontSize);
@@ -905,25 +883,25 @@
     if (shrink) {
         // 缩小~
         CGFloat scale = 1 / 10.0;
-        contentInsets.top += fontSize * scale;
+        contentInsets.top    += fontSize * scale;
         contentInsets.bottom += fontSize * scale;
-        contentInsets.left += fontSize * scale;
-        contentInsets.right += fontSize * scale;
+        contentInsets.left   += fontSize * scale;
+        contentInsets.right  += fontSize * scale;
         contentInsets = UIEdgeInsetPixelFloor(contentInsets);
         size = CGSizeMake(fontSize - fontSize * scale * 2, fontSize - fontSize * scale * 2);
         size = CGSizePixelRound(size);
     }
-    
+    // run设置代理，为了在文本中插入图片
     YYTextRunDelegate *delegate = [YYTextRunDelegate new];
-    delegate.ascent = ascent;
-    delegate.descent = descent;
-    delegate.width = bounding.size.width;
+    delegate.ascent             = ascent;
+    delegate.descent            = descent;
+    delegate.width              = bounding.size.width;
     
     WBTextImageViewAttachment *attachment = [WBTextImageViewAttachment new];
-    attachment.contentMode = UIViewContentModeScaleAspectFit;
+    attachment.contentMode   = UIViewContentModeScaleAspectFit;
     attachment.contentInsets = contentInsets;
-    attachment.size = size;
-    attachment.imageURL = [WBStatusHelper defaultURLForImageURL:imageURL];
+    attachment.size          = size;
+    attachment.imageURL      = [WBStatusHelper defaultURLForImageURL:imageURL];
     
     NSMutableAttributedString *atr = [[NSMutableAttributedString alloc] initWithString:YYTextAttachmentToken];
     [atr setTextAttachment:attachment range:NSMakeRange(0, atr.length)];

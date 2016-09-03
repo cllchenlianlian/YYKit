@@ -8,7 +8,7 @@
 
 #import "WBStatusCell.h"
 #import "YYControl.h"
-
+// 阅读第二次
 @implementation WBStatusTitleView
 - (instancetype)initWithFrame:(CGRect)frame {
     if (frame.size.width == 0 && frame.size.height == 0) {
@@ -35,7 +35,7 @@
 }
 @end
 
-
+// 阅读第二次
 @implementation WBStatusProfileView {
     BOOL _trackingTouch;
 }
@@ -53,7 +53,7 @@
     _avatarView.origin = CGPointMake(kWBCellPadding, kWBCellPadding + 3);
     _avatarView.contentMode = UIViewContentModeScaleAspectFill;
     [self addSubview:_avatarView];
-    
+    // 创建一个圆环
     CALayer *avatarBorder = [CALayer layer];
     avatarBorder.frame = _avatarView.bounds;
     avatarBorder.borderWidth = CGFloatFromPixel(1);
@@ -73,8 +73,11 @@
     _nameLabel.size = CGSizeMake(kWBCellNameWidth, 24);
     _nameLabel.left = _avatarView.right + kWBCellNamePaddingLeft;
     _nameLabel.centerY = 27;
+    // 指示布局和渲染是否放到后台线程
     _nameLabel.displaysAsynchronously = YES;
+    // 忽略Label的属性，使用TextLayout进行渲染和布局
     _nameLabel.ignoreCommonProperties = YES;
+    // 动画显示
     _nameLabel.fadeOnAsynchronouslyDisplay = NO;
     _nameLabel.fadeOnHighlight = NO;
     _nameLabel.lineBreakMode = NSLineBreakByClipping;
@@ -88,6 +91,7 @@
     _sourceLabel.ignoreCommonProperties = YES;
     _sourceLabel.fadeOnAsynchronouslyDisplay = NO;
     _sourceLabel.fadeOnHighlight = NO;
+    // 高亮的触发的block
     _sourceLabel.highlightTapAction = ^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
         if ([weak_self.cell.delegate respondsToSelector:@selector(cell:didClickInLabel:textRange:)]) {
             [weak_self.cell.delegate cell:weak_self.cell didClickInLabel:(YYLabel *)containerView textRange:range];
@@ -595,13 +599,14 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         topLineBG = [UIImage imageWithSize:CGSizeMake(1, 3) drawBlock:^(CGContextRef context) {
-            CGContextSetFillColorWithColor(context, [UIColor blackColor].CGColor);
+            CGContextSetFillColorWithColor(context, [UIColor redColor].CGColor);
             CGContextSetShadowWithColor(context, CGSizeMake(0, 0), 0.8, [UIColor colorWithWhite:0 alpha:0.08].CGColor);
             CGContextAddRect(context, CGRectMake(-2, 3, 4, 4));
             CGContextFillPath(context);
         }];
+        
         bottomLineBG = [UIImage imageWithSize:CGSizeMake(1, 3) drawBlock:^(CGContextRef context) {
-            CGContextSetFillColorWithColor(context, [UIColor blackColor].CGColor);
+            CGContextSetFillColorWithColor(context, [UIColor yellowColor].CGColor);
             CGContextSetShadowWithColor(context, CGSizeMake(0, 0.4), 2, [UIColor colorWithWhite:0 alpha:0.08].CGColor);
             CGContextAddRect(context, CGRectMake(-2, -2, 4, 2));
             CGContextFillPath(context);
@@ -785,7 +790,9 @@
     _retweetBackgroundView.hidden = YES;
     _retweetTextLabel.hidden = YES;
     _cardView.hidden = YES;
+    
     if (layout.picHeight == 0 && layout.retweetPicHeight == 0) {
+        // 如果没有自己发的微博和转发的微博，隐藏图片
         [self _hideImageViews];
     }
     
@@ -838,6 +845,7 @@
     }
 }
 
+// 阅读完2次
 - (void)_setImageViewWithTop:(CGFloat)imageTop isRetweet:(BOOL)isRetweet {
     CGSize picSize = isRetweet ? _layout.retweetPicSize : _layout.picSize;
     NSArray *pics = isRetweet ? _layout.status.retweetedStatus.pics : _layout.status.pics;
@@ -907,6 +915,7 @@
                     }
                     ((YYControl *)imageView).image = image;
                     if (from != YYWebImageFromMemoryCacheFast) {
+                        // 过渡动画
                         CATransition *transition = [CATransition animation];
                         transition.duration = 0.15;
                         transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];

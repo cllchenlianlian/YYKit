@@ -149,7 +149,7 @@ typedef NS_ENUM(NSUInteger, WBPictureBadgeType) {
  */
 @interface WBStatusTitle : NSObject
 @property (nonatomic, assign) int32_t baseColor;
-@property (nonatomic, strong) NSString *text; ///< 文本，例如"仅自己可见"
+@property (nonatomic, strong) NSString *text; ///< 文本，例如"仅自己可见、热门"
 @property (nonatomic, strong) NSString *iconURL; ///< 图标URL，需要加Default
 @end
 
@@ -252,7 +252,7 @@ typedef NS_ENUM(NSUInteger, WBPictureBadgeType) {
 @property (nonatomic, strong) WBUser *user; ///< 当前发微博的用户
 @property (nonatomic, assign) int32_t userType; ///< 用户类型
 
-@property (nonatomic, strong) WBStatusTitle *title; ///< 标题栏 (通常为nil)
+@property (nonatomic, strong) WBStatusTitle *title; ///< 标题栏 (通常为nil，第二个微博的有title)
 @property (nonatomic, strong) NSString *picBg; ///< 微博VIP背景图，需要替换 "os7"
 @property (nonatomic, strong) NSString *text; ///< 正文
 @property (nonatomic, strong) NSURL *thumbnailPic; ///< 缩略图
