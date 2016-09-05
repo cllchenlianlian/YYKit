@@ -8,6 +8,7 @@
 
 #import "YYAppDelegate.h"
 #import "YYRootViewController.h"
+#import "YYKit.h"
 
 /// Fix the navigation bar height when hide status bar.
 @interface YYExampleNavBar : UINavigationBar
@@ -70,6 +71,8 @@
     self.window.rootViewController = self.rootViewController;
     self.window.backgroundColor = [UIColor grayColor];
     [self.window makeKeyAndVisible];
+    NSLog(@"%@",[UIApplication sharedApplication].cachesPath);
+    
     
     return YES;
 }

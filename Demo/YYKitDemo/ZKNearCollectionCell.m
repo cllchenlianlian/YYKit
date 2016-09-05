@@ -127,6 +127,9 @@
     dispatch_once(&onceToken, ^{
         NSString *path = [[UIApplication sharedApplication].cachesPath stringByAppendingPathComponent:@"weibo.avatar"];
         YYImageCache *cache = [[YYImageCache alloc] initWithPath:path];
+        NSLog(@"%f",cache.diskCache.totalCost/1024.0/1024.0);
+        [[cache diskCache] removeAllObjects];
+        NSLog(@"%f",cache.diskCache.totalCost/1024.0/1024.0);
         manager = [[YYWebImageManager alloc] initWithCache:cache queue:[YYWebImageManager sharedManager].queue];
         manager.sharedTransformBlock = ^(UIImage *image, NSURL *url) {
             if (!image) return image;

@@ -80,7 +80,7 @@
         NSString *path = [[NSBundle mainBundle] pathForResource:@"nearBy.json" ofType:nil];
         NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:path];
         NSArray *arr = dict[@"data"][@"list"];
-        arr = [NSArray modelArrayWithClass:[YYTestModel class] json:arr];
+        arr = [NSArray yy_modelArrayWithClass:[YYTestModel class] json:arr];
         for (YYTestModel *model in arr) {
             [self.layouts addObject:[[ZKNeaStatusLayout alloc]initWithModel:model]];
         }
