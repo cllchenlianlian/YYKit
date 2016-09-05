@@ -80,12 +80,13 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
         case 'f': return YYEncodingTypeFloat | qualifier;
         case 'd': return YYEncodingTypeDouble | qualifier;
         case 'D': return YYEncodingTypeLongDouble | qualifier;
+            
         case '#': return YYEncodingTypeClass | qualifier;
         case ':': return YYEncodingTypeSEL | qualifier;
-        case '*': return YYEncodingTypeCString | qualifier;
+        case '*': return YYEncodingTypeCString | qualifier; //c字符串, char *str="hello world!";
         case '^': return YYEncodingTypePointer | qualifier;
         case '[': return YYEncodingTypeCArray | qualifier;
-        case '(': return YYEncodingTypeUnion | qualifier;
+        case '(': return YYEncodingTypeUnion | qualifier; //共用体
         case '{': return YYEncodingTypeStruct | qualifier;
         case '@': {
             // 因为block类型,类似于T@?,C,N,V_block
@@ -135,6 +136,11 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
     if (name) {
         _name = [NSString stringWithUTF8String:name];
     }
+    /**
+     *  1、方法本身的编码
+     *  2、方法返回值类型的编码
+     *  3、方法参数列表中，所有类型的编码
+     */
     // 获取对方法的参数、返回值的描述
     const char *typeEncoding = method_getTypeEncoding(method);
     if (typeEncoding) {
@@ -159,6 +165,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
         }
         _argumentTypeEncodings = argumentTypes;
     }
+    NSLog(@"1==>%@,2==>%@,3==>%@",_typeEncoding,_returnTypeEncoding,_argumentTypeEncodings);
     return self;
 }
 
@@ -186,6 +193,11 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
      TB,N,V_boool
      T@"NSString",&,N,V_string   // 一个属性大概会有的一些特性
      T@"NSArray",&,N,V_arr
+     
+     每一逗号，都代表一个objc_property_attribute_t
+     name为第一个字符
+     value为后面的字符
+     例如name = T，value=@"NSString"
      */
     objc_property_attribute_t *attrs = property_copyAttributeList(property, &attrCount);
     for (unsigned int i = 0; i < attrCount; i++) {
@@ -344,7 +356,6 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
 
 + (instancetype)classInfoWithClass:(Class)cls {
     if (!cls) return nil;
-    // 用于缓存？？
     // 类信息缓存
     static CFMutableDictionaryRef classCache;
     // 元类信息缓存

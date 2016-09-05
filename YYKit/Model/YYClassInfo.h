@@ -33,7 +33,7 @@ typedef NS_OPTIONS(NSUInteger, YYEncodingType) {
     YYEncodingTypeFloat      = 11, ///< float
     YYEncodingTypeDouble     = 12, ///< double
     YYEncodingTypeLongDouble = 13, ///< long double
-    YYEncodingTypeObject     = 14, ///< id
+    YYEncodingTypeObject     = 14, ///< id //NSObject（1.Foundation Class 2.自定义NSObject子类）
     YYEncodingTypeClass      = 15, ///< Class
     YYEncodingTypeSEL        = 16, ///< SEL
     YYEncodingTypeBlock      = 17, ///< block
@@ -89,7 +89,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding);
 @interface YYClassIvarInfo : NSObject
 @property (nonatomic, assign, readonly) Ivar ivar;
 @property (nonatomic, strong, readonly) NSString *name; ///< Ivar's name
-@property (nonatomic, assign, readonly) ptrdiff_t offset; ///< Ivar's offset
+@property (nonatomic, assign, readonly) ptrdiff_t offset; ///< Ivar's offset 这个是干嘛用的
 @property (nonatomic, strong, readonly) NSString *typeEncoding; ///< Ivar's type encoding
 @property (nonatomic, assign, readonly) YYEncodingType type; ///< Ivar's type
 - (instancetype)initWithIvar:(Ivar)ivar;
