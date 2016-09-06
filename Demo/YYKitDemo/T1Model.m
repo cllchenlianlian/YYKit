@@ -153,11 +153,11 @@
 
     NSDictionary *featureDics = dic[@"features"];
     if ([featureDics isKindOfClass:[NSDictionary class]]) {
-        [_mediaThumb yy_modelSetWithDictionary:featureDics[@"thumb"]];
-        [_mediaSmall yy_modelSetWithDictionary:featureDics[@"small"]];
-        [_mediaMedium yy_modelSetWithDictionary:featureDics[@"medium"]];
-        [_mediaLarge yy_modelSetWithDictionary:featureDics[@"large"]];
-        [_mediaOrig yy_modelSetWithDictionary:featureDics[@"orig"]];
+        [_mediaThumb modelSetWithDictionary:featureDics[@"thumb"]];
+        [_mediaSmall modelSetWithDictionary:featureDics[@"small"]];
+        [_mediaMedium modelSetWithDictionary:featureDics[@"medium"]];
+        [_mediaLarge modelSetWithDictionary:featureDics[@"large"]];
+        [_mediaOrig modelSetWithDictionary:featureDics[@"orig"]];
         
         NSString *url;
         url = [_mediaURL stringByAppendingString:@":thumb"];
@@ -298,6 +298,7 @@
 }
 + (NSDictionary *)modelCustomPropertyMapper {
     return @{
+             //表示，在context字典中key为target_tweet_id
         @"targetTweetID" : @"context.target_tweet_id",
         @"participantIDs" : @"context.participant_ids",
         @"participantsCount" : @"context.participants_count",
@@ -341,7 +342,7 @@
         } else {
             NSDictionary *cDic = dic[@"conversation"];
             if ([cDic isKindOfClass:[NSDictionary class]]) {
-                T1Conversation *conversation = [T1Conversation yy_modelWithDictionary:cDic];
+                T1Conversation *conversation = [T1Conversation modelWithDictionary:cDic];
                 
                 NSDictionary *entityID = dic[@"entity_id"];
                 if ([entityID isKindOfClass:[NSDictionary class]]) {

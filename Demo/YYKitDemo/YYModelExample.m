@@ -13,7 +13,7 @@
 #pragma mark Simple Object Example
 
 @interface YYBook : NSObject
-@property (nonatomic, copy) NSString *name;
+@property (nonatomic, copy)   NSString *name;
 @property (nonatomic, assign) uint64_t pages;
 @property (nonatomic, strong) NSDate *publishDate;
 @end
@@ -22,13 +22,13 @@
 @end
 
 static void SimpleObjectExample() {
-    YYBook *book = [YYBook yy_modelWithJSON:@"     \
+    YYBook *book = [YYBook modelWithJSON:@"     \
     {                                           \
        \"name\": \"Harry Potter\",              \
        \"pages\": 512,                          \
        \"publishDate\": \"2010-01-01\"          \
     }"];
-    NSString *bookJSON = [book yy_modelToJSONString];
+    NSString *bookJSON = [book modelToJSONString];
     NSLog(@"Book: %@", bookJSON);
 }
 
@@ -57,7 +57,7 @@ static void SimpleObjectExample() {
 @end
 
 static void NestObjectExample() {
-    YYRepo *repo = [YYRepo yy_modelWithJSON:@"         \
+    YYRepo *repo = [YYRepo modelWithJSON:@"         \
     {                                               \
         \"rid\": 123456789,                         \
         \"name\": \"YYKit\",                        \
@@ -67,7 +67,7 @@ static void NestObjectExample() {
             \"name\" : \"ibireme\"                  \
         } \
     }"];
-    NSString *repoJSON = [repo yy_modelToJSONString];
+    NSString *repoJSON = [repo modelToJSONString];
     NSLog(@"Repo: %@", repoJSON);
 }
 
@@ -101,7 +101,7 @@ static void NestObjectExample() {
 @end
 
 static void ContainerObjectExample() {
-    YYAlbum *album = [YYAlbum yy_modelWithJSON:@"          \
+    YYAlbum *album = [YYAlbum modelWithJSON:@"          \
     {                                                   \
     \"name\" : \"Happy Birthday\",                      \
     \"photos\" : [                                      \
@@ -120,7 +120,7 @@ static void ContainerObjectExample() {
     },                                                  \
     \"likedUserIds\" : [10001,10002]                    \
     }"];
-    NSString *albumJSON = [album yy_modelToJSONString];
+    NSString *albumJSON = [album modelToJSONString];
     NSLog(@"Album: %@", albumJSON);
 }
 
@@ -152,8 +152,8 @@ static void ContainerObjectExample() {
 @end
 
 static void CustomMapperExample() {
-    YYMessage *message = [YYMessage yy_modelWithJSON:@"{\"i\":\"2000000001\",\"c\":\"Hello\",\"t\":\"1437237598000\"}"];
-    NSString *messageJSON = [message yy_modelToJSONString];
+    YYMessage *message = [YYMessage modelWithJSON:@"{\"i\":\"2000000001\",\"c\":\"Hello\",\"t\":\"1437237598000\"}"];
+    NSString *messageJSON = [message modelToJSONString];
     NSLog(@"Book: %@", messageJSON);
 }
 
@@ -169,11 +169,11 @@ static void CustomMapperExample() {
 @end
 
 @implementation YYShadow
-- (void)encodeWithCoder:(NSCoder *)aCoder { [self yy_modelEncodeWithCoder:aCoder]; }
-- (id)initWithCoder:(NSCoder *)aDecoder { return [self yy_modelInitWithCoder:aDecoder]; }
-- (id)copyWithZone:(NSZone *)zone { return [self yy_modelCopy]; }
-- (NSUInteger)hash { return [self yy_modelHash]; }
-- (BOOL)isEqual:(id)object { return [self yy_modelIsEqual:object]; }
+- (void)encodeWithCoder:(NSCoder *)aCoder { [self modelEncodeWithCoder:aCoder]; }
+- (id)initWithCoder:(NSCoder *)aDecoder { return [self modelInitWithCoder:aDecoder]; }
+- (id)copyWithZone:(NSZone *)zone { return [self modelCopy]; }
+- (NSUInteger)hash { return [self modelHash]; }
+- (BOOL)isEqual:(id)object { return [self modelIsEqual:object]; }
 @end
 
 static void CodingCopyingHashEqualExample() {

@@ -81,7 +81,7 @@
         NSMutableArray *layouts = [NSMutableArray new];
         for (int i = 0; i <= 3; i++) {
             NSData *data = [NSData dataNamed:[NSString stringWithFormat:@"twitter_%d.json",i]];
-            T1APIRespose *response = [T1APIRespose yy_modelWithJSON:data];
+            T1APIRespose *response = [T1APIRespose modelWithJSON:data];
             for (id item in response.timelineItmes) {
                 if ([item isKindOfClass:[T1Tweet class]]) {
                     T1Tweet *tweet = item;

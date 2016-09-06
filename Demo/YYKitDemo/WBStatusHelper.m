@@ -225,13 +225,13 @@
     NSString *jsonPath = [path stringByAppendingPathComponent:@"info.json"];
     NSData *json = [NSData dataWithContentsOfFile:jsonPath];
     if (json.length) {
-        group = [WBEmoticonGroup yy_modelWithJSON:json];
+        group = [WBEmoticonGroup modelWithJSON:json];
     }
     if (!group) {
         NSString *plistPath = [path stringByAppendingPathComponent:@"info.plist"];
         NSDictionary *plist = [NSDictionary dictionaryWithContentsOfFile:plistPath];
         if (plist.count) {
-            group = [WBEmoticonGroup yy_modelWithJSON:plist];
+            group = [WBEmoticonGroup modelWithJSON:plist];
         }
     }
     for (WBEmoticon *emoticon in group.emoticons) {
@@ -260,7 +260,7 @@
         NSString *emoticonPlistPath = [emoticonBundlePath stringByAppendingPathComponent:@"emoticons.plist"];
         NSDictionary *plist = [NSDictionary dictionaryWithContentsOfFile:emoticonPlistPath];
         NSArray *packages = plist[@"packages"];
-        groups = (NSMutableArray *)[NSArray yy_modelArrayWithClass:[WBEmoticonGroup class] json:packages];
+        groups = (NSMutableArray *)[NSArray modelArrayWithClass:[WBEmoticonGroup class] json:packages];
         
         NSMutableDictionary *groupDic = [NSMutableDictionary new];
         for (int i = 0, max = (int)groups.count; i < max; i++) {
@@ -274,7 +274,7 @@
             NSString *path = [emoticonBundlePath stringByAppendingPathComponent:group.groupID];
             NSString *infoPlistPath = [path stringByAppendingPathComponent:@"info.plist"];
             NSDictionary *info = [NSDictionary dictionaryWithContentsOfFile:infoPlistPath];
-            [group yy_modelSetWithDictionary:info];
+            [group modelSetWithDictionary:info];
             if (group.emoticons.count == 0) {
                 i--;
                 max--;
@@ -289,7 +289,7 @@
             if (!group) continue;
             NSString *infoJSONPath = [[[emoticonBundlePath stringByAppendingPathComponent:@"additional"] stringByAppendingPathComponent:path] stringByAppendingPathComponent:@"info.json"];
             NSData *infoJSON = [NSData dataWithContentsOfFile:infoJSONPath];
-            WBEmoticonGroup *addGroup = [WBEmoticonGroup yy_modelWithJSON:infoJSON];
+            WBEmoticonGroup *addGroup = [WBEmoticonGroup modelWithJSON:infoJSON];
             if (addGroup.emoticons.count) {
                 for (WBEmoticon *emoticon in addGroup.emoticons) {
                     emoticon.group = group;
