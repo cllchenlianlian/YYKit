@@ -68,7 +68,7 @@ static void NestObjectExample() {
         } \
     }"];
     NSString *repoJSON = [repo modelToJSONString];
-    NSLog(@"Repo: %@", repoJSON);
+//    NSLog(@"Repo: %@", repoJSON);
 }
 
 
@@ -121,7 +121,7 @@ static void ContainerObjectExample() {
     \"likedUserIds\" : [10001,10002]                    \
     }"];
     NSString *albumJSON = [album modelToJSONString];
-    NSLog(@"Album: %@", albumJSON);
+//    NSLog(@"Album: %@", albumJSON);
 }
 
 
@@ -154,7 +154,7 @@ static void ContainerObjectExample() {
 static void CustomMapperExample() {
     YYMessage *message = [YYMessage modelWithJSON:@"{\"i\":\"2000000001\",\"c\":\"Hello\",\"t\":\"1437237598000\"}"];
     NSString *messageJSON = [message modelToJSONString];
-    NSLog(@"Book: %@", messageJSON);
+//    NSLog(@"Book: %@", messageJSON);
 }
 
 
@@ -184,7 +184,7 @@ static void CodingCopyingHashEqualExample() {
     
     YYShadow *shadow2 = [shadow deepCopy]; // Archive and Unachive
     BOOL equal = [shadow isEqual:shadow2];
-    NSLog(@"shadow equals: %@",equal ? @"YES" : @"NO");
+//    NSLog(@"shadow equals: %@",equal ? @"YES" : @"NO");
 }
 
 

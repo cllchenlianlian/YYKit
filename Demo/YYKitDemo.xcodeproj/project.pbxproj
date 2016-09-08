@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6F21E7331D7FECC5007FB939 /* YYModelRecord in Resources */ = {isa = PBXBuildFile; fileRef = 6F21E7321D7FECC5007FB939 /* YYModelRecord */; };
 		6F7C84E31D6EAA3F00AD00FD /* YYTestTimelineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F7C84E21D6EAA3F00AD00FD /* YYTestTimelineViewController.m */; };
 		6F7C84E81D6EAB6E00AD00FD /* nearBy.json in Resources */ = {isa = PBXBuildFile; fileRef = 6F7C84E71D6EAB6E00AD00FD /* nearBy.json */; };
 		6F7C84EB1D6ED17A00AD00FD /* ZKNearCollectionCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F7C84EA1D6ED17A00AD00FD /* ZKNearCollectionCell.m */; };
@@ -201,6 +202,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6F21E7321D7FECC5007FB939 /* YYModelRecord */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = YYModelRecord; sourceTree = "<group>"; };
 		6F7C84E11D6EAA3F00AD00FD /* YYTestTimelineViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYTestTimelineViewController.h; sourceTree = "<group>"; };
 		6F7C84E21D6EAA3F00AD00FD /* YYTestTimelineViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTestTimelineViewController.m; sourceTree = "<group>"; };
 		6F7C84E71D6EAB6E00AD00FD /* nearBy.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = nearBy.json; sourceTree = "<group>"; };
@@ -1053,6 +1055,7 @@
 				D9B260081BEE79370038C00A /* NSObject+YYModel.m */,
 				D9B260091BEE79370038C00A /* YYClassInfo.h */,
 				D9B2600A1BEE79370038C00A /* YYClassInfo.m */,
+				6F21E7321D7FECC5007FB939 /* YYModelRecord */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1251,6 +1254,7 @@
 				D939F5E71B7CB052003EEC6A /* dribbble512_imageio.png in Resources */,
 				D9CC99F61B8B568B00A9466D /* mew_baseline.gif in Resources */,
 				D9CC99FA1B8B568B00A9466D /* mew_interlaced.png in Resources */,
+				6F21E7331D7FECC5007FB939 /* YYModelRecord in Resources */,
 				D98193311BC829F900BA0604 /* twitter_0.json in Resources */,
 				D9CC99F71B8B568B00A9466D /* mew_progressive.jpg in Resources */,
 			);

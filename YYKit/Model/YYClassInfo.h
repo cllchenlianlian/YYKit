@@ -33,15 +33,15 @@ typedef NS_OPTIONS(NSUInteger, YYEncodingType) {
     YYEncodingTypeFloat      = 11, ///< float
     YYEncodingTypeDouble     = 12, ///< double
     YYEncodingTypeLongDouble = 13, ///< long double
-    YYEncodingTypeObject     = 14, ///< id
+    YYEncodingTypeObject     = 14, ///< id //NSObject（1.Foundation Class 2.自定义NSObject子类）
     YYEncodingTypeClass      = 15, ///< Class
     YYEncodingTypeSEL        = 16, ///< SEL
     YYEncodingTypeBlock      = 17, ///< block
     YYEncodingTypePointer    = 18, ///< void*
-    YYEncodingTypeStruct     = 19, ///< struct
+    YYEncodingTypeStruct     = 19, ///< struct 
     YYEncodingTypeUnion      = 20, ///< union
-    YYEncodingTypeCString    = 21, ///< char*
-    YYEncodingTypeCArray     = 22, ///< char[10] (for example)
+    YYEncodingTypeCString    = 21, ///< char* C语言字符串
+    YYEncodingTypeCArray     = 22, ///< char[10] (for example) C语言数组
     
     YYEncodingTypeQualifierMask   = 0xFF00,   ///< mask of qualifier
     YYEncodingTypeQualifierConst  = 1 << 8,  ///< const

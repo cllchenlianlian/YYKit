@@ -1,0 +1,130 @@
+问题记录
+1、对于缓存YYModelMeta的cache类型CFMutableDictionaryRef的使用方法
+2、对于modelCustomClassForDictionary方法，是干什么用的
+3、cls的类方法modelCustomClassForDictionary，是不是提供给cls，如果字典符合某个东西，就创建指定的cls对象，而不是创建当前cls的对象
+4、CFDictionaryApplyFunction函数的应用,遍历字典中的key，去modelmeta中找到属性，赋值
+    遍历字典的key和value触发指定的函数
+    ModelSetWithDictionaryFunction：
+
+
+2、JSON->Model的流程
+    根据Model的cls获取对应的ModelMeta
+    1.1 先从根据cls从cache中尝试获取
+    1.2 如果cache中没有cls对应的ModelMeta对象，就根据cls创建一个ModelMeta对象
+        根据cls创建对应的ModelMeta流程
+        1.2.1 根据cls获取YYClassInfo对象
+            1.2.1.1 首先从classCache中获取
+            1.2.1.2 在classCache中没有，就创建YYClassInfo
+                YYClassInfo中，重点元素有
+                1.2.1.2.1 _methodInfos方法信息的集合
+                1.2.1.2.2 _propertyInfos
+                1.2.1.2.3 _ivarInfos
+                1.2.1.2.4 _superClassInfo
+        1.2.2 获取blacklist和whitelist名单(现在还不知道干嘛用的)
+        1.2.3 获取该类的modelContainerPropertyGenericClass方法返回的字典
+                这个方法是获取模型中集合属性的元素对应类型的字典
+                遍历这个字典，生成genericMapper字典
+                该字典是  属性名 ：类
+        1.2.4 遍历当前类，及其父类，及其父类类...直到NSObject(不包括NSObejct)的_propertyInfo属性，
+              根据_proptertyInfo字典中的每一个YYClassPropertyInfo对象
+              YYClassPropertyInfo和genericMapper、YYClassInfo去生成对应的_YYModelPropertyMeta(更多信息去描述YYClassPropertyInfo)
+              将_YYModelPropertyMeta对象放入allPropertyMetas集合中。
+        1.2.5 allPropertyMetas存放着是当前类，及其父类等等的_YYModelPropertyMeta对象
+        1.2.6 获取该类的modelCustomPropertyMapper方法返回的字典
+              一般来说属性的name对应字典中的key，但是如果你的属性的name想要对应字典中不同的key，或者多个key，就需要在modelCustomPropertyMapper方法中指定。
+              例如
+              {
+                 name ：@["userName",@"idName"],----> _keyPathPropertyMetas
+                 avater ： @"key1.key2"         ----> _multiKeysPropertyMetas
+              }
+    1.3 获取到cls对应的ModelMeta后，先缓存到字典中，key为cls
+    1.4 如果当前cls实现了modelCustomClassForDictionary，判断dict是否满足条件
+        1.4.1 如果满足，就创建指定cls的对象，而不是当前的cls对象
+    1.5 cls的NSObject对象，调用modelSetWithDictionary:方法，为属相赋值
+        1.5.1 根据当前对象的cls，获取ModelMeta对象，根据ModelMeta的_keyMappedCount和字典的键值对个数比较
+            1.5.1.1 _keyMappedCount大于getCountfor(dict)
+                    先根据dict的key去给对象的属性赋值
+        1.5.2 ModelSetValueForProperty使用这个方法为属性赋值
+    1.6 返回对象，JSON->Model结束
+
+3、Model->JSON的流程
+
+
+/---------------------------------------------
+YYClassInfo中的属性
+
+1、_methodInfos的记录，参数Method
+    _name：方法名
+    _typeEncoding：方法编码
+    _returnTypeEncoding：方法返回值编码
+    _argumentTypeEncodings：参数编码
+
+
+2、_propertyInfos
+    关于YYClassPropertyInfo的创建
+    _name：属性名
+    _cls：如果属性的类型是一个NSOjbect的类型，记录下来，否则为nil
+    _ivarName：属性生成的变量名字
+    _typeEncoding：属性的类型字符串
+    _type：属性的类型，如nonatomic、assign、readonly，NSString类型，CGFloat类型
+    _getter：get方法
+    _setter：set方法
+    在property中，有可能自定义getter和setter方法
+    /**
+    *   对于自定义的getter和setter
+    例如：
+        @property(getter=intGetFoo, setter=intSetFoo:) int intSetterGetter;
+        Ti,GintGetFoo,SintSetFoo:,VintSetterGetter
+    */
+
+3、_ivarInfos
+    _type：变量类型
+    _name：变量名字 
+    _offset：变量的地址偏移
+
+/---------------------------------------------
+
+_YYModelPropertyMeta的创建流程
+参数
+1、YYClassInfo：classInfo
+2、YYClassPropertyInfo：propertyInfo
+3、Class：generic(可能为nil)
+    _name：属性名
+    _type：属性类型编码
+    _info：当前的propertyInfo
+    _genericCls：可能为nil...如果该propertyInfo在类中是一个集合，那就存在_genericCls，
+    _nsType：这个是属性的类型，例如是NSString、NSNumber、NSDate等我们常用的
+    _isCNumber：是否为基本类型
+    _hasCustomClassFromDictionary：这个属性具体还不明确
+    _getter：可能为nil
+    _setter：可能为nil
+    _isKVCCompatible：判断是否支持KVC
+表示集合中元素的类型
+
+/---------------------------------------------
+
+_YYModelMeta
+    _allPropertyMetas：存放着当前类及其父类...的所有的属性对应的_YYModelPropertyMeta对象
+    _keyMappedCount：总共的属性个数
+    _mapper：映射的属性的链表的头指针(通过这个可以找到所有的属性)
+    _keyPathPropertyMetas：属性对应的是key路径的属性集合
+    _multiKeysPropertyMetas：属性对应多个映射key的属性集合
+    _classInfo：类信息
+    _hasCustomTransformFromDictionary：存在自定义的转化，为某些属性
+
+/---------------------------------------------
+
+ModelSetContext：一个封装了cls，NSObject，meta的结构体
+
+/---------------------------------------------
+
+
+
+
+
+/??????????????????????????????????????????????
+1、关于归档没有看
+
+
+
+

@@ -82,6 +82,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
         case '{': return YYEncodingTypeStruct | qualifier;
         case '@': {
             if (len == 2 && *(type + 1) == '?')
+                // block类型，'@?'
                 return YYEncodingTypeBlock | qualifier;
             else
                 return YYEncodingTypeObject | qualifier;
@@ -161,15 +162,26 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
     
     YYEncodingType type = 0;
     unsigned int attrCount;
+    /**
+     *  T@"Car",&,N,V_car
+     *  对于这个属性来说
+     *  attrs来说每一个元素为
+     *  name = T , value = @"Car"
+     *  name = & , value = ""
+     *  .....
+     *  name = V , value = _car
+     */
     objc_property_attribute_t *attrs = property_copyAttributeList(property, &attrCount);
+    // 这个循环是去获取属性的变量和对应的修饰，以及如果自定义的getter和setter方法
     for (unsigned int i = 0; i < attrCount; i++) {
         switch (attrs[i].name[0]) {
-            case 'T': { // Type encoding
+            case 'T': {  // Type encoding，如果第一个是T，那么value装的就是这个属性的类型
                 if (attrs[i].value) {
                     _typeEncoding = [NSString stringWithUTF8String:attrs[i].value];
+                    // 获取属性的类型
                     type = YYEncodingGetType(attrs[i].value);
-                    
                     if ((type & YYEncodingTypeMask) == YYEncodingTypeObject && _typeEncoding.length) {
+                        // 如果是Object类型
                         NSScanner *scanner = [NSScanner scannerWithString:_typeEncoding];
                         if (![scanner scanString:@"@\"" intoString:NULL]) continue;
                         
@@ -194,6 +206,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
                 }
             } break;
             case 'V': { // Instance variable
+                // 获取属性生成的变量的名字
                 if (attrs[i].value) {
                     _ivarName = [NSString stringWithUTF8String:attrs[i].value];
                 }
@@ -237,6 +250,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
     }
     
     _type = type;
+    // 如果没有自定义getter和setter，而是使用property自动生成的get和set方法，就创建
     if (_name.length) {
         if (!_getter) {
             _getter = NSSelectorFromString(_name);
